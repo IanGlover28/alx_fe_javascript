@@ -38,24 +38,49 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ✅ Function to synchronize quotes from the "server"
+    // ✅ Function to synchronize quotes with the server (using POST method)
     async function syncQuotes() {
-        const serverQuotes = await fetchQuotesFromServer();
+        try {
+            // Fetching the latest quotes from the server
+            const serverQuotes = await fetchQuotesFromServer();
 
-        // Conflict resolution: choose the server data as the authoritative source
-        const mergedQuotes = [...serverQuotes, ...quotes];
-        quotes = mergedQuotes.filter((value, index, self) =>
-            index === self.findIndex((t) => (
-                t.text === value.text && t.category === value.category
-            ))
-        );
+            // Conflict resolution: merge server data with local data
+            const mergedQuotes = [...serverQuotes, ...quotes];
+            quotes = mergedQuotes.filter((value, index, self) =>
+                index === self.findIndex((t) => (
+                    t.text === value.text && t.category === value.category
+                ))
+            );
 
-        // Save to local storage
-        saveQuotes();
+            // Save updated quotes to local storage
+            saveQuotes();
 
-        // Display conflict resolution message
-        conflictMessage.textContent = "Data has been synchronized with the server!";
-        setTimeout(() => conflictMessage.textContent = "", 3000); // Clear after 3 seconds
+            // Send local quotes to the server using POST method
+            const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: "Quote Sync",
+                    body: JSON.stringify(quotes), // Sending the whole quotes array as a body (for simulation)
+                    userId: 1  // mock userId for JSONPlaceholder API
+                })
+            });
+
+            // Handle server response
+            const data = await response.json();
+            console.log('Sync success:', data);
+
+            // Display synchronization message
+            conflictMessage.textContent = "Data has been synchronized with the server!";
+            setTimeout(() => conflictMessage.textContent = "", 3000); // Clear after 3 seconds
+
+        } catch (error) {
+            console.error("Sync failed:", error);
+            conflictMessage.textContent = "Failed to sync with the server!";
+            setTimeout(() => conflictMessage.textContent = "", 3000); // Clear after 3 seconds
+        }
     }
 
     // ✅ Function to populate categories dynamically
