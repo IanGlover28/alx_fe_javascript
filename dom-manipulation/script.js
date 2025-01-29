@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const categorySelect = document.getElementById("categoryFilter");
     const importFileInput = document.getElementById("importFile");
     const exportButton = document.getElementById("exportQuotes");
+    const conflictMessage = document.getElementById("conflictMessage");
 
     let quotes = JSON.parse(localStorage.getItem("quotes")) || [
         { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivation" },
@@ -17,7 +18,41 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("quotes", JSON.stringify(quotes));
     }
 
-    // ✅ Function to populate category dropdown
+    // ✅ Simulate a server response with new quotes (for demo)
+    function fetchFromServer() {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Simulate new server data
+                const serverQuotes = [
+                    { text: "The best way to predict the future is to create it.", category: "Motivation" },
+                    { text: "The only way to do great work is to love what you do.", category: "Life" }
+                ];
+                resolve(serverQuotes);
+            }, 1000);
+        });
+    }
+
+    // ✅ Function to synchronize quotes from the "server"
+    async function syncQuotes() {
+        const serverQuotes = await fetchFromServer();
+
+        // Conflict resolution: choose the server data as the authoritative source
+        const mergedQuotes = [...serverQuotes, ...quotes];
+        quotes = mergedQuotes.filter((value, index, self) =>
+            index === self.findIndex((t) => (
+                t.text === value.text && t.category === value.category
+            ))
+        );
+
+        // Save to local storage
+        saveQuotes();
+
+        // Display conflict resolution message
+        conflictMessage.textContent = "Data has been synchronized with the server!";
+        setTimeout(() => conflictMessage.textContent = "", 3000); // Clear after 3 seconds
+    }
+
+    // ✅ Function to populate categories dynamically
     function populateCategories() {
         const categories = [...new Set(quotes.map(q => q.category))];
         categorySelect.innerHTML = `<option value="all">All Categories</option>`;
@@ -122,6 +157,9 @@ document.addEventListener("DOMContentLoaded", function () {
     categorySelect.addEventListener("change", filterQuotes);
     exportButton.addEventListener("click", exportQuotes);
     importFileInput.addEventListener("change", importFromJsonFile);
+
+    // ✅ Periodic sync with the server every 10 seconds
+    setInterval(syncQuotes, 10000);
 
     // ✅ Initialize categories, populate the category filter, and show a quote
     populateCategories();
