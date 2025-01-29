@@ -18,8 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("quotes", JSON.stringify(quotes));
     }
 
-    // ✅ Simulate a server response with new quotes (for demo)
-    function fetchFromServer() {
+    // ✅ Simulate fetching quotes from a server
+    function fetchQuotesFromServer() {
         return new Promise((resolve) => {
             setTimeout(() => {
                 // Simulate new server data
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ Function to synchronize quotes from the "server"
     async function syncQuotes() {
-        const serverQuotes = await fetchFromServer();
+        const serverQuotes = await fetchQuotesFromServer();
 
         // Conflict resolution: choose the server data as the authoritative source
         const mergedQuotes = [...serverQuotes, ...quotes];
