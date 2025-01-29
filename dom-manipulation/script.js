@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log('Sync success:', data);
 
             // Display synchronization message
-            conflictMessage.textContent = "Data has been synchronized with the server!";
+            conflictMessage.textContent = "Quotes synced with server!";
             setTimeout(() => conflictMessage.textContent = "", 3000); // Clear after 3 seconds
 
         } catch (error) {
