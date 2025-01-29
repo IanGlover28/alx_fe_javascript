@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const exportButton = document.getElementById("exportQuotes");
     const conflictMessage = document.getElementById("conflictMessage");
 
+    // Load quotes from local storage or set default quotes
     let quotes = JSON.parse(localStorage.getItem("quotes")) || [
         { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivation" },
         { text: "Life is 10% what happens to us and 90% how we react to it.", category: "Life" },
