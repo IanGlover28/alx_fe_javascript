@@ -18,18 +18,23 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("quotes", JSON.stringify(quotes));
     }
 
-    // ✅ Simulate fetching quotes from a server
-    function fetchQuotesFromServer() {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // Simulate new server data
-                const serverQuotes = [
-                    { text: "The best way to predict the future is to create it.", category: "Motivation" },
-                    { text: "The only way to do great work is to love what you do.", category: "Life" }
-                ];
-                resolve(serverQuotes);
-            }, 1000);
-        });
+    // ✅ Simulate fetching quotes from JSONPlaceholder
+    async function fetchQuotesFromServer() {
+        try {
+            const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+            const data = await response.json();
+
+            // Simulate extracting quote-like content from the posts
+            const serverQuotes = data.slice(0, 5).map(post => ({
+                text: post.title,
+                category: "General"  // You can change this to a more relevant category or randomize it.
+            }));
+
+            return serverQuotes;
+        } catch (error) {
+            console.error("Failed to fetch quotes from server:", error);
+            return [];
+        }
     }
 
     // ✅ Function to synchronize quotes from the "server"
